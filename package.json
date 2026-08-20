@@ -1,0 +1,12 @@
+{
+  "name": "tic-tac-toe-web",
+  "version": "1.0.0",
+  "description": "Premium Tic-Tac-Toe web application",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx -y http-server -p 8000",
+    "dev": "npx -y http-server -p 8000"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Tic-Tac-Toe</title>
+    <!-- Google Fonts for modern styling -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    <canvas id="cursor-canvas"></canvas>
+
+    <div class="app-container">
+        <!-- Floating neon background glow spots -->
+        <div class="glow-spot glow-1"></div>
+        <div class="glow-spot glow-2"></div>
+
+        <header>
+            <h1 class="logo">TIC-TAC-TOE</h1>
+            <div id="turn-indicator" class="turn-indicator">
+                <span class="pulse-icon"></span>
+                <span id="turn-text">Register to start...</span>
+            </div>
+        </header>
+
+        <main class="game-layout">
+            <!-- 3x3 Game Board -->
+            <section class="board-container glass-card">
+                <div id="game-board" class="board">
+                    <div class="cell" data-index="0"></div>
+                    <div class="cell" data-index="1"></div>
+                    <div class="cell" data-index="2"></div>
+                    <div class="cell" data-index="3"></div>
+                    <div class="cell" data-index="4"></div>
+                    <div class="cell" data-index="5"></div>
+                    <div class="cell" data-index="6"></div>
+                    <div class="cell" data-index="7"></div>
+                    <div class="cell" data-index="8"></div>
+                </div>
+            </section>
+
+            <!-- Scoreboard & Controls Sidebar -->
+            <aside class="sidebar">
+                <!-- Scoreboard Card -->
+                <section class="glass-card scoreboard-card">
+                    <h2>SCOREBOARD</h2>
+                    <div class="score-grid">
+                        <div class="score-item player-1-score">
+                            <span class="player-label" id="p1-score-label">Player 1 (X)</span>
+                            <span class="score-value" id="p1-score-val">0</span>
+                        </div>
+                        <div class="score-item player-2-score">
+                            <span class="player-label" id="p2-score-label">Player 2 (O)</span>
+                            <span class="score-value" id="p2-score-val">0</span>
+                        </div>
+                        <div class="score-item draws-score">
+                            <span class="player-label">Draws</span>
+                            <span class="score-value" id="draws-score-val">0</span>
+                        </div>
+                        <div class="score-item total-score">
+                            <span class="player-label">Total Games</span>
+                            <span class="score-value" id="total-score-val">0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Actions Dashboard -->
+                <section class="glass-card controls-card">
+                    <button id="btn-restart" class="btn btn-primary">Restart Match</button>
+                    <div class="btn-group">
+                        <button id="btn-edit-players" class="btn btn-secondary">Game Settings</button>
+                        <button id="btn-reset-scores" class="btn btn-secondary">Reset Scores</button>
+                    </div>
+                    <button id="btn-help" class="btn btn-info">How to Play</button>
+                </section>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Registration & Mode Setup Modal Overlay -->
+    <div id="register-modal" class="modal-overlay active">
+        <div class="modal-content glass-card animate-zoom">
+            <h2>Game Setup</h2>
+            <p>Choose mode and enter player details to begin.</p>
+            <form id="register-form">
+                <!-- Mode Toggle -->
+                <div class="mode-select-group">
+                    <label class="section-label">Select Mode</label>
+                    <div class="mode-options">
+                        <button type="button" class="mode-btn active" data-mode="pvp">
+                            <span class="mode-icon">👥</span> Pass & Play
+                        </button>
+                        <button type="button" class="mode-btn" data-mode="pvc">
+                            <span class="mode-icon">🤖</span> vs Computer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Difficulty Select (Visible in PvC mode) -->
+                <div id="difficulty-group" class="difficulty-group hidden">
+                    <label class="section-label">AI Difficulty</label>
+                    <div class="diff-options">
+                        <button type="button" class="diff-btn" data-diff="easy">Easy</button>
+                        <button type="button" class="diff-btn active" data-diff="medium">Medium</button>
+                        <button type="button" class="diff-btn" data-diff="hard">Impossible</button>
+                    </div>
+                </div>
+
+                <!-- Names Input -->
+                <div class="input-group">
+                    <label for="p1-name-input">Player 1 Name <span class="badge-x">X</span></label>
+                    <input type="text" id="p1-name-input" placeholder="Player 1" autocomplete="off" required>
+                </div>
+                <div class="input-group" id="p2-input-group">
+                    <label for="p2-name-input">Player 2 Name <span class="badge-o">O</span></label>
+                    <input type="text" id="p2-name-input" placeholder="Player 2" autocomplete="off" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Start Match</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Help Modal Overlay -->
+    <div id="help-modal" class="modal-overlay">
+        <div class="modal-content glass-card animate-zoom">
+            <h2>How to Play</h2>
+            <div class="help-scroll-area">
+                <ul>
+                    <li>The game is played on a <strong>3x3 grid</strong>.</li>
+                    <li>Choose between <strong>2 Players</strong> or <strong>vs Computer AI</strong> mode.</li>
+                    <li><strong>Player 1</strong> uses <strong>X</strong> (Neon Red) and plays first.</li>
+                    <li><strong>Player 2 / Computer</strong> uses <strong>O</strong> (Electric Cyan).</li>
+                    <li>Players take turns placing their symbols on empty cells.</li>
+                    <li>Align <strong>three symbols</strong> in a row, column, or diagonal to win!</li>
+                </ul>
+                <div class="grid-ref-demo">
+                    <div class="demo-cell">1</div><div class="demo-cell">2</div><div class="demo-cell">3</div>
+                    <div class="demo-cell">4</div><div class="demo-cell">5</div><div class="demo-cell">6</div>
+                    <div class="demo-cell">7</div><div class="demo-cell">8</div><div class="demo-cell">9</div>
+                </div>
+            </div>
+            <button id="btn-close-help" class="btn btn-secondary btn-block">Back to Game</button>
+        </div>
+    </div>
+
+    <!-- Match Over Modal Overlay -->
+    <div id="gameover-modal" class="modal-overlay">
+        <div class="modal-content glass-card animate-zoom text-center">
+            <div id="gameover-icon" class="trophy-icon">🏆</div>
+            <h2 id="gameover-title">Victory!</h2>
+            <p id="gameover-message">Player Wins the game!</p>
+            <div class="btn-group-column">
+                <button id="btn-next-round" class="btn btn-primary">Play Next Match</button>
+                <button id="btn-menu-close" class="btn btn-secondary">Close View</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
