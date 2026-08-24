@@ -15,13 +15,13 @@
 class Game {
 private:
     Board board;
-    Player p1;
-    Player p2;
+    Player person1;
+    Player person2;
     Player* currentPlayer;
 
     // Scoreboard variables
-    int p1Wins;
-    int p2Wins;
+    int person1Wins;
+    int person2Wins;
     int draws;
     int totalGames;
 
