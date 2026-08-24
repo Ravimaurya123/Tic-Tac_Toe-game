@@ -21,9 +21,15 @@
 
         <header>
             <h1 class="logo">TIC-TAC-TOE</h1>
-            <div id="turn-indicator" class="turn-indicator">
-                <span class="pulse-icon"></span>
-                <span id="turn-text">Register to start...</span>
+            <div class="header-controls">
+                <button id="btn-toggle-music" class="btn-music active" title="Toggle Sweet Flute Music Tone">
+                    <span class="music-icon">🎶</span>
+                    <span class="music-text">Flute Tone: ON</span>
+                </button>
+                <div id="turn-indicator" class="turn-indicator">
+                    <span class="pulse-icon"></span>
+                    <span id="turn-text">Register to start...</span>
+                </div>
             </div>
         </header>
 
@@ -81,10 +87,10 @@
         </main>
     </div>
 
-    <!-- Registration & Mode Setup Modal Overlay -->
+    <!-- Welcome & Registration Modal Overlay -->
     <div id="register-modal" class="modal-overlay active">
         <div class="modal-content glass-card animate-zoom">
-            <h2>Game Setup</h2>
+            <h2>Welcome to Tic-Tac-Toe Game</h2>
             <p>Choose mode and enter player details to begin.</p>
             <form id="register-form">
                 <!-- Mode Toggle -->

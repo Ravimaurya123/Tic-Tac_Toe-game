@@ -107,6 +107,67 @@ header {
     text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+.header-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-music {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.btn-music:hover {
+    background: rgba(124, 77, 255, 0.18);
+    border-color: var(--color-accent);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(124, 77, 255, 0.3);
+}
+
+.btn-music.active {
+    border-color: var(--color-p2);
+    box-shadow: 0 0 15px var(--color-p2-glow);
+    color: var(--text-primary);
+    background: rgba(0, 240, 255, 0.12);
+}
+
+.btn-music.muted {
+    border-color: rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+    opacity: 0.65;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.music-icon {
+    font-size: 1.1rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.btn-music.active .music-icon {
+    animation: musicPulse 2s infinite ease-in-out;
+}
+
+@keyframes musicPulse {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.18) rotate(6deg); }
+}
+
 .turn-indicator {
     display: flex;
     align-items: center;

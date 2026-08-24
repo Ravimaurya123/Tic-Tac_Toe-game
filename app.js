@@ -24,6 +24,213 @@ let scores = {
     totalGames: 0
 };
 
+// --- Ambient Sweet Flute Audio Engine (Web Audio API) ---
+class FluteAudioEngine {
+    constructor() {
+        this.audioCtx = null;
+        this.isPlaying = false;
+        this.isMuted = false;
+        this.masterGain = null;
+        this.delayNode = null;
+        this.delayFeedback = null;
+        this.timerId = null;
+        this.currentNoteIndex = 0;
+        
+        // Pentatonic peaceful flute frequencies (Hz)
+        this.notes = {
+            'E4': 329.63,
+            'G4': 392.00,
+            'A4': 440.00,
+            'B4': 493.88,
+            'D5': 587.33,
+            'E5': 659.25,
+            'G5': 783.99,
+            'A5': 880.00,
+            'B5': 987.77,
+            'REST': 0
+        };
+
+        // Soothing ambient flute melody composition
+        this.melody = [
+            { note: 'E5', duration: 1.5 },
+            { note: 'G5', duration: 1.0 },
+            { note: 'A5', duration: 2.0 },
+            { note: 'G5', duration: 1.0 },
+            { note: 'E5', duration: 1.5 },
+            { note: 'D5', duration: 1.5 },
+            { note: 'B4', duration: 2.0 },
+            { note: 'REST', duration: 0.5 },
+            
+            { note: 'D5', duration: 1.0 },
+            { note: 'E5', duration: 1.5 },
+            { note: 'G5', duration: 1.5 },
+            { note: 'A5', duration: 2.5 },
+            { note: 'REST', duration: 0.5 },
+
+            { note: 'B5', duration: 1.5 },
+            { note: 'A5', duration: 1.0 },
+            { note: 'G5', duration: 1.5 },
+            { note: 'E5', duration: 1.5 },
+            { note: 'D5', duration: 2.0 },
+            { note: 'E5', duration: 2.5 },
+            { note: 'REST', duration: 0.8 },
+
+            { note: 'G4', duration: 1.5 },
+            { note: 'A4', duration: 1.5 },
+            { note: 'B4', duration: 1.5 },
+            { note: 'D5', duration: 1.5 },
+            { note: 'E5', duration: 3.0 },
+            { note: 'REST', duration: 1.0 }
+        ];
+    }
+
+    init() {
+        if (this.audioCtx) return;
+        const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtxClass) return;
+        this.audioCtx = new AudioCtxClass();
+        
+        // Master Gain (gentle volume)
+        this.masterGain = this.audioCtx.createGain();
+        this.masterGain.gain.setValueAtTime(0.20, this.audioCtx.currentTime);
+
+        // Echo / Delay effect for spacious ambient flute feel
+        this.delayNode = this.audioCtx.createDelay();
+        this.delayNode.delayTime.setValueAtTime(0.36, this.audioCtx.currentTime);
+
+        this.delayFeedback = this.audioCtx.createGain();
+        this.delayFeedback.gain.setValueAtTime(0.30, this.audioCtx.currentTime);
+
+        const delayFilter = this.audioCtx.createBiquadFilter();
+        delayFilter.type = 'lowpass';
+        delayFilter.frequency.setValueAtTime(1500, this.audioCtx.currentTime);
+
+        this.delayNode.connect(delayFilter);
+        delayFilter.connect(this.delayFeedback);
+        this.delayFeedback.connect(this.delayNode);
+
+        this.masterGain.connect(this.audioCtx.destination);
+        this.delayNode.connect(this.masterGain);
+    }
+
+    playFluteNote(freq, duration) {
+        if (!this.audioCtx || this.isMuted || freq === 0) return;
+
+        const now = this.audioCtx.currentTime;
+
+        // Primary Sine Oscillator (Fundamental)
+        const osc1 = this.audioCtx.createOscillator();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, now);
+
+        // Secondary Soft Overtone
+        const osc2 = this.audioCtx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 2, now);
+
+        const osc2Gain = this.audioCtx.createGain();
+        osc2Gain.gain.setValueAtTime(0.08, now);
+        osc2.connect(osc2Gain);
+
+        // Expressive Pitch Vibrato (LFO)
+        const lfo = this.audioCtx.createOscillator();
+        const lfoGain = this.audioCtx.createGain();
+        lfo.frequency.setValueAtTime(5.0, now);
+        lfoGain.gain.setValueAtTime(freq * 0.01, now);
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc1.frequency);
+        lfoGain.connect(osc2.frequency);
+        lfo.start(now);
+        lfo.stop(now + duration + 0.5);
+
+        // Acoustic Breath Noise Effect
+        const bufferSize = Math.floor(this.audioCtx.sampleRate * (duration + 0.2));
+        const noiseBuffer = this.audioCtx.createBuffer(1, bufferSize, this.audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+        }
+        const whiteNoise = this.audioCtx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+
+        const noiseFilter = this.audioCtx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.setValueAtTime(1600, now);
+        noiseFilter.Q.setValueAtTime(3.5, now);
+
+        const noiseGain = this.audioCtx.createGain();
+        noiseGain.gain.setValueAtTime(0.001, now);
+        noiseGain.gain.linearRampToValueAtTime(0.015, now + 0.1);
+        noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        whiteNoise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        whiteNoise.start(now);
+        whiteNoise.stop(now + duration + 0.2);
+
+        // Note Envelope
+        const noteGain = this.audioCtx.createGain();
+        noteGain.gain.setValueAtTime(0.0001, now);
+        noteGain.gain.linearRampToValueAtTime(0.28, now + 0.15);
+        noteGain.gain.setValueAtTime(0.28, now + duration * 0.75);
+        noteGain.gain.exponentialRampToValueAtTime(0.0001, now + duration + 0.35);
+
+        osc1.connect(noteGain);
+        osc2Gain.connect(noteGain);
+        noiseGain.connect(noteGain);
+
+        noteGain.connect(this.masterGain);
+        noteGain.connect(this.delayNode);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + duration + 0.4);
+        osc2.stop(now + duration + 0.4);
+    }
+
+    startMelodyLoop() {
+        if (this.isPlaying) return;
+        this.init();
+        if (!this.audioCtx) return;
+        
+        if (this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume();
+        }
+        this.isPlaying = true;
+        this.currentNoteIndex = 0;
+        this.scheduleNextNote();
+    }
+
+    scheduleNextNote() {
+        if (!this.isPlaying) return;
+        
+        const currentItem = this.melody[this.currentNoteIndex];
+        const beatDuration = 0.95;
+        const noteDuration = currentItem.duration * beatDuration;
+
+        if (currentItem.note !== 'REST') {
+            const freq = this.notes[currentItem.note];
+            this.playFluteNote(freq, noteDuration);
+        }
+
+        this.currentNoteIndex = (this.currentNoteIndex + 1) % this.melody.length;
+
+        this.timerId = setTimeout(() => {
+            this.scheduleNextNote();
+        }, noteDuration * 1000);
+    }
+
+    toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.masterGain && this.audioCtx) {
+            this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.20, this.audioCtx.currentTime);
+        }
+        return this.isMuted;
+    }
+}
+
+const flutePlayer = new FluteAudioEngine();
+
 // DOM elements
 const DOM = {
     registerModal: document.getElementById('register-modal'),
@@ -50,6 +257,7 @@ const DOM = {
     btnCloseHelp: document.getElementById('btn-close-help'),
     btnNextRound: document.getElementById('btn-next-round'),
     btnMenuClose: document.getElementById('btn-menu-close'),
+    btnToggleMusic: document.getElementById('btn-toggle-music'),
     gameoverTitle: document.getElementById('gameover-title'),
     gameoverMessage: document.getElementById('gameover-message'),
     gameoverIcon: document.getElementById('gameover-icon'),
@@ -115,6 +323,48 @@ function setupEventListeners() {
         startMatch();
     });
     DOM.btnMenuClose.addEventListener('click', () => closeModal(DOM.gameoverModal));
+
+    if (DOM.btnToggleMusic) {
+        DOM.btnToggleMusic.addEventListener('click', toggleFluteMusic);
+    }
+
+    // Auto-start sweet background flute music on user's first interaction
+    const startAudioOnFirstUserAction = () => {
+        if (!flutePlayer.isPlaying && !flutePlayer.isMuted) {
+            flutePlayer.startMelodyLoop();
+        }
+        document.removeEventListener('click', startAudioOnFirstUserAction);
+        document.removeEventListener('keydown', startAudioOnFirstUserAction);
+    };
+    document.addEventListener('click', startAudioOnFirstUserAction);
+    document.addEventListener('keydown', startAudioOnFirstUserAction);
+}
+
+// Toggle background flute tone ON/OFF
+function toggleFluteMusic() {
+    if (!flutePlayer.audioCtx) {
+        flutePlayer.startMelodyLoop();
+    }
+    const isMuted = flutePlayer.toggleMute();
+    if (DOM.btnToggleMusic) {
+        const musicIcon = DOM.btnToggleMusic.querySelector('.music-icon');
+        const musicText = DOM.btnToggleMusic.querySelector('.music-text');
+        
+        if (isMuted) {
+            DOM.btnToggleMusic.classList.remove('active');
+            DOM.btnToggleMusic.classList.add('muted');
+            if (musicIcon) musicIcon.textContent = '🔇';
+            if (musicText) musicText.textContent = 'Flute Tone: OFF';
+        } else {
+            DOM.btnToggleMusic.classList.remove('muted');
+            DOM.btnToggleMusic.classList.add('active');
+            if (musicIcon) musicIcon.textContent = '🎶';
+            if (musicText) musicText.textContent = 'Flute Tone: ON';
+            if (!flutePlayer.isPlaying) {
+                flutePlayer.startMelodyLoop();
+            }
+        }
+    }
 }
 
 // Modal helper controls

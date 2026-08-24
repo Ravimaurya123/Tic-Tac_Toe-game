@@ -23,11 +23,11 @@ namespace GameColors {
 
 // Constructor: initializes scores and terminal properties
 Game::Game() 
-    : currentPlayer(nullptr), player1Wins(0), player2Wins(0), draws(0), totalGames(0) {
+    : currentPlayer(nullptr), person1Wins(0), person2Wins(0), draws(0), totalGames(0) {
     enableVirtualTerminalProcessing();
     // Default names initially
-    player1 = Player("Player 1", 'X');
-    player2 = Player("Player 2", 'O');
+    person1 = Player("Player 1", 'X');
+    person2 = Player("Player 2", 'O');
 }
 
 // Windows-specific setup to enable standard ANSI console color sequences
@@ -60,7 +60,7 @@ void Game::printHeader(const std::string& title) const {
 // Gets player names before game starts
 void Game::setupPlayers() {
     clearScreen();
-    printHeader("PLAYER REGISTRATION");
+    printHeader("WELCOME TO TIC-TAC-TOE GAME");
     
     std::string name1, name2;
     std::cout << "\nEnter name for Player 1 (" << GameColors::RED << "X" << GameColors::RESET << "): ";
@@ -75,8 +75,8 @@ void Game::setupPlayers() {
         name2 = "Player 2";
     }
 
-    player1.setName(name1);
-    player2.setName(name2);
+    person1.setName(name1);
+    person2.setName(name2);
 }
 
 // Interactive main menu
@@ -132,15 +132,15 @@ void Game::displayMenu() {
 // Controls a complete match flow
 void Game::playGame() {
     board.resetBoard();
-    currentPlayer = &player1;
+    currentPlayer = &person1;
     bool matchRunning = true;
 
     while (matchRunning) {
         clearScreen();
         printHeader("TIC-TAC-TOE MATCH");
-        std::cout << GameColors::MAGENTA << " " << player1.getName() << " (" 
+        std::cout << GameColors::MAGENTA << " " << person1.getName() << " (" 
                   << GameColors::RED << "X" << GameColors::MAGENTA << ")  VS  " 
-                  << player2.getName() << " (" 
+                  << person2.getName() << " (" 
                   << GameColors::BLUE << "O" << GameColors::MAGENTA << ")\n" << GameColors::RESET;
 
         board.displayBoard();
@@ -172,10 +172,10 @@ void Game::playGame() {
                     std::cout << GameColors::GREEN << GameColors::BOLD << "★ Congratulations! " 
                               << currentPlayer->getName() << " Wins! ★\n\n" << GameColors::RESET;
                     
-                    if (currentPlayer == &player1) {
-                        player1Wins++;
+                    if (currentPlayer == &person1) {
+                        person1Wins++;
                     } else {
-                        player2Wins++;
+                        person2Wins++;
                     }
                     totalGames++;
                     matchRunning = false;
@@ -211,7 +211,7 @@ void Game::playGame() {
 
 // Switches turns between players
 void Game::switchPlayer() {
-    currentPlayer = (currentPlayer == &player1) ? &player2 : &player1;
+    currentPlayer = (currentPlayer == &person1) ? &person2 : &person1;
 }
 
 // Scans rows, cols, and diagonals to determine if player wins
@@ -262,16 +262,16 @@ void Game::showScoreboard() const {
     clearScreen();
     printHeader("GAME SCOREBOARD");
     
-    std::string p1Name = player1.getName();
-    std::string p2Name = player2.getName();
+    std::string p1Name = person1.getName();
+    std::string p2Name = person2.getName();
 
     std::cout << "\n  " << GameColors::MAGENTA << p1Name << GameColors::RESET 
               << " (" << GameColors::RED << "X" << GameColors::RESET << ") Wins: " 
-              << GameColors::GREEN << GameColors::BOLD << player1Wins << GameColors::RESET << "\n";
+              << GameColors::GREEN << GameColors::BOLD << person1Wins << GameColors::RESET << "\n";
               
     std::cout << "  " << GameColors::MAGENTA << p2Name << GameColors::RESET 
               << " (" << GameColors::BLUE << "O" << GameColors::RESET << ") Wins: " 
-              << GameColors::GREEN << GameColors::BOLD << player2Wins << GameColors::RESET << "\n";
+              << GameColors::GREEN << GameColors::BOLD << person2Wins << GameColors::RESET << "\n";
               
     std::cout << "  Draws:            " 
               << GameColors::YELLOW << GameColors::BOLD << draws << GameColors::RESET << "\n";
@@ -287,8 +287,8 @@ void Game::showScoreboard() const {
 void Game::resetScoreboard() {
     clearScreen();
     printHeader("RESET SCOREBOARD");
-    player1Wins = 0;
-    player2Wins = 0;
+    person1Wins = 0;
+    person2Wins = 0;
     draws = 0;
     totalGames = 0;
     std::cout << GameColors::GREEN << "\nScoreboard has been successfully reset to 0!\n\n" << GameColors::RESET;
